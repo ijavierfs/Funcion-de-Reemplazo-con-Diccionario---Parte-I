@@ -1,0 +1,156 @@
+{
+  "compatibilityLevel": 1550,
+  "model": {
+    "annotations": [
+      {
+        "name": "__PBI_TimeIntelligenceEnabled",
+        "value": "0"
+      },
+      {
+        "name": "PBIDesktopVersion",
+        "value": "2.126.927.0 (24.02)"
+      },
+      {
+        "name": "PBI_QueryOrder",
+        "value": "[\"Censo_Poblacion\",\"_ReemplazarTexto\",\"_DiccionarioReemplazos\"]"
+      },
+      {
+        "name": "PBI_ProTooling",
+        "value": "[\"DevMode\"]"
+      }
+    ],
+    "culture": "es-ES",
+    "cultures": [
+      {
+        "name": "es-ES",
+        "linguisticMetadata": {
+          "content": {
+            "DynamicImprovement": "HighConfidence",
+            "Language": "en-US",
+            "Version": "1.0.0"
+          },
+          "contentType": "json"
+        }
+      }
+    ],
+    "dataAccessOptions": {
+      "legacyRedirects": true,
+      "returnErrorValuesAsNull": true
+    },
+    "defaultPowerBIDataSourceVersion": "powerBI_V3",
+    "expressions": [
+      {
+        "name": "_ReemplazarTexto",
+        "annotations": [
+          {
+            "name": "PBI_NavigationStepName",
+            "value": "Navegación"
+          },
+          {
+            "name": "PBI_ResultType",
+            "value": "Function"
+          }
+        ],
+        "expression": [
+          "let",
+          "    _ReemplazarTexto = (texto as text, reemplazos as record) as text =>",
+          "        let",
+          "            texto_Reemplazado = List.Accumulate(",
+          "                Record.FieldNames(reemplazos),",
+          "                texto,",
+          "                (estado, clave) => Text.Replace(estado, clave, Record.Field(reemplazos, clave))",
+          "            )",
+          "        in",
+          "            texto_Reemplazado",
+          "in",
+          "    _ReemplazarTexto"
+        ],
+        "kind": "m",
+        "lineageTag": "d1716dfa-9949-46c1-8dd7-38c252b2a266"
+      },
+      {
+        "name": "_DiccionarioReemplazos",
+        "annotations": [
+          {
+            "name": "PBI_NavigationStepName",
+            "value": "Navegación"
+          },
+          {
+            "name": "PBI_ResultType",
+            "value": "Table"
+          }
+        ],
+        "expression": [
+          "let",
+          "    Origen = Table.FromRows(Json.Document(Binary.Decompress(Binary.FromText(\"TZE9boQwEIWvYlEjcYZZIMgRfzLLNmiLCTiStQ6szBIpdDlDLpE2SpeWi2VsWJLGfn7f09OM3DQeVMdacKh8Vgqeh7yEqGBR7Hv+jryz33gHSGMQFONpGlcWH1BLNHJ0uET9gqPPUjqI0cXuluPhYKblC30Grpntb0cziASPWFhkdc4jiGgASmXYGdWtgVqEHJiIE7585BueTKvQ4RxOIAT8K3goBKRrLsdXNGYNCl48AkvBjkh19uX8E+3SU1tAYvm0ihJ3c10Ax5vUevnug11S5s92KdCqxf4mA9Bohd11sxxP1HWaL4NtTyZ1XX7mdlj7K8ogC800s06yo+ylUc+Scrt0/QafMFjeNe1EbBPuf9R8wXVsNbf4Ru75Fw==\", BinaryEncoding.Base64), Compression.Deflate)), let _t = ((type nullable text) meta [Serialized.Text = true]) in type table [Name = _t, Value = _t]),",
+          "    #\"Tipo cambiado\" = Table.TransformColumnTypes(Origen,{{\"Name\", type text}, {\"Value\", type text}}),",
+          "    #\"Valor reemplazado\" = Table.ReplaceValue(#\"Tipo cambiado\",\",\",\"\",Replacer.ReplaceText,{\"Name\", \"Value\"}),",
+          "    #\"Texto en mayúsculas\" = Table.TransformColumns(#\"Valor reemplazado\",{{\"Name\", Text.Upper, type text}, {\"Value\", Text.Upper, type text}})",
+          "in",
+          "    #\"Texto en mayúsculas\""
+        ],
+        "kind": "m",
+        "lineageTag": "ec2f544f-d3e4-448b-bf04-8abcf1559488"
+      }
+    ],
+    "sourceQueryCulture": "es-ES",
+    "tables": [
+      {
+        "name": "Censo_Poblacion",
+        "annotations": [
+          {
+            "name": "PBI_NavigationStepName",
+            "value": "Navegación"
+          },
+          {
+            "name": "PBI_ResultType",
+            "value": "Table"
+          }
+        ],
+        "columns": [
+          {
+            "name": "Provincia",
+            "annotations": [
+              {
+                "name": "SummarizationSetBy",
+                "value": "Automatic"
+              }
+            ],
+            "dataType": "string",
+            "lineageTag": "e24299b3-9f1c-4e1d-bfd5-5f75ab99a9c1",
+            "sourceColumn": "Provincia",
+            "summarizeBy": "none"
+          }
+        ],
+        "lineageTag": "391586ea-b2ef-4b19-9bb4-09b30beedf4b",
+        "partitions": [
+          {
+            "name": "Censo_Poblacion",
+            "mode": "import",
+            "source": {
+              "expression": [
+                "let",
+                "    Origen = Json.Document(Web.Contents(\"https://servicios.ine.es/wstempus/js/es/DATOS_TABLA/t20/e245/p04/a2019/00014004.px?tip=AM\")),",
+                "    #\"Convertida en tabla\" = Table.FromList(Origen, Splitter.SplitByNothing(), null, null, ExtraValues.Error),",
+                "    #\"Se expandió Column1\" = Table.ExpandRecordColumn(#\"Convertida en tabla\", \"Column1\", {\"Nombre\"}, {\"Column1.Nombre\"}),",
+                "    #\"Dividir columna por delimitador\" = Table.SplitColumn(#\"Se expandió Column1\", \"Column1.Nombre\", Splitter.SplitTextByEachDelimiter({\",\"}, QuoteStyle.Csv, true), {\"Column1.Nombre.1\", \"Column1.Nombre.2\"}),",
+                "    #\"Tipo cambiado\" = Table.TransformColumnTypes(#\"Dividir columna por delimitador\",{{\"Column1.Nombre.1\", type text}, {\"Column1.Nombre.2\", type text}}),",
+                "    #\"Dividir columna por delimitador1\" = Table.SplitColumn(#\"Tipo cambiado\", \"Column1.Nombre.1\", Splitter.SplitTextByEachDelimiter({\",\"}, QuoteStyle.Csv, true), {\"Column1.Nombre.1.1\", \"Column1.Nombre.1.2\"}),",
+                "    #\"Tipo cambiado1\" = Table.TransformColumnTypes(#\"Dividir columna por delimitador1\",{{\"Column1.Nombre.1.1\", type text}, {\"Column1.Nombre.1.2\", type text}}),",
+                "    #\"Columnas quitadas\" = Table.RemoveColumns(#\"Tipo cambiado1\",{\"Column1.Nombre.1.2\", \"Column1.Nombre.2\"}),",
+                "    #\"Columnas con nombre cambiado\" = Table.RenameColumns(#\"Columnas quitadas\",{{\"Column1.Nombre.1.1\", \"Provincia\"}}),",
+                "    #\"Duplicados quitados\" = Table.Distinct(#\"Columnas con nombre cambiado\"),",
+                "    #\"Valor reemplazado\" = Table.ReplaceValue(#\"Duplicados quitados\",\",\",\"\",Replacer.ReplaceText,{\"Provincia\"}),",
+                "    #\"Texto en mayúsculas\" = Table.TransformColumns(#\"Valor reemplazado\",{{\"Provincia\", Text.Upper, type text}}),",
+                "    #\"_ReemplazarConDiccionario\" = Table.TransformColumns(#\"Texto en mayúsculas\", {{\"Provincia\", each _ReemplazarTexto(_, Record.FromTable(_DiccionarioReemplazos)), type text}})",
+                "in",
+                "    #\"_ReemplazarConDiccionario\""
+              ],
+              "type": "m"
+            }
+          }
+        ]
+      }
+    ]
+  }
+}

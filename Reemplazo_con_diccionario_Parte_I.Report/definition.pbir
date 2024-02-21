@@ -1,0 +1,9 @@
+{
+  "version": "1.0",
+  "datasetReference": {
+    "byPath": {
+      "path": "../Reemplazo_con_diccionario_Parte_I.Dataset"
+    },
+    "byConnection": null
+  }
+}
